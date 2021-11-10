@@ -5,10 +5,11 @@ library(magrittr)
 ### make URLs by splitting the URL into two pieces --
 ### "before the year" and "after the year"
 
-#LA buoys: bygl1, burl1, 42040, DPIA1, gdil1, taml1
+#LA buoys: bygl1, burl1, 42040, DPIA1, gdil1, taml1, 42007, wavm6,
+# 42001, pclf1, 42038
 #FL buoys: mlfr1
 
-url1 <- "http://www.ndbc.noaa.gov/view_text_file.php?filename=44013h"
+url1 <- "http://www.ndbc.noaa.gov/view_text_file.php?filename=wavm6h"
 url2 <- ".txt.gz&dir=data/historical/stdmet/"
 
 
