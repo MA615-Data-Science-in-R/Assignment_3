@@ -20,7 +20,7 @@ years <- c(2005)
 
 urls <- str_c(url1, buoy_tags, "h", years, url2, sep = "")
 
-filenames <- str_c(buoy_tags, "_2005", sep = "")
+filenames <- str_c(buoy_tags, sep = "")
 
 ###  Read the data from the website
 
@@ -38,7 +38,7 @@ for (i in 1:N){
      file %<>% rename(YYYY=YY)
      file$YYYY <- rep(yr, nrow(file))
    }
-   
+   file$station <- rep(filenames[i],nrow(file))
    
    assign(filenames[i], file)
     
@@ -74,3 +74,31 @@ for (i in 1:N){
   
 }
 
+# test <- `42040_2005`[1,]
+# test <- mutate(test,x = 29.207, y = -88.237)
+# 
+# library(gstat)
+# library(sp)
+# library(tidyverse)
+# library(sf)
+# library("rnaturalearth")
+# library("rnaturalearthdata")
+# coordinates(test) <- ~ x + y
+# #proj4string(test) <- CRS("+init=epsg:28992")
+# world <- ne_countries(scale = "medium", returnclass = "sf")
+# ret <- class(world)
+# world %>% ggplot() + geom_sf() + stat_sf_coordinates()
+
+tighten <- function(df){
+  df %<>% filter(MM == "08", DD %in% c("26","27","28","29","30","31"))
+}
+
+result <- list(`42001_2005`, `42003_2005`, `42007_2005`, `42014_2005`, `42035_2005`, `42036_2005`, `42038_2005`, `42039_2005`, `42040_2005`, `42046_2005`, `42047_2005`, burl1_2005, bygl1_2005, capl1_2005, dpia1_2005, fgbl1_2005, gdil1_2005, labl1_2005, lkpl1_2005, mlrf1_2005, pcbf1_2005, pclf1_2005, sbpt2_2005,shpf1_2005, srst2_2005, taml1_2005, wavm6_2005) %>%
+  lapply(tighten)
+
+fix_nums <- function(df){
+  df %<>% mutate(YYYY = as.numeric(YYYY), DD = as.numeric(DD), MM = as.numeric(MM), hh = as.numeric(hh), mm = as.numeric(mm))
+}
+result2 <- lapply(result, fix_nums)
+
+fulldf <- bind_rows(result2)
