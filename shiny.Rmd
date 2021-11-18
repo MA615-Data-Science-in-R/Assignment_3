@@ -1,0 +1,40 @@
+---
+title: "MA615 Assignment3"
+author: "William Zen, Jack Carbaugh, Zara Waheed, Kosuke Sasaki"
+date: "11/17/2021"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+Sys.setenv("LANGUAGE" = "EN")
+Sys.setlocale("LC_ALL", "C")
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+library(shiny)
+library(maps)
+library(drat)
+library(hurricaneexposuredata)
+library(hurricaneexposure)
+library(ggplot2)
+```
+
+```{r, include = FALSE}
+source("hmap.R")
+```
+
+```{r, echo=FALSE}
+# rainfall
+ui_1 <- fluidPage(
+  selectInput("days", "select the rainfall day", c(-5:5)),
+  plotOutput("plot"),
+)
+server_1 <- function(input, output, session) {
+  output$plot <- renderPlot({maprain(input$days)}, res = 96)
+  }
+
+shinyApp(ui_1, server_1)
+
+```

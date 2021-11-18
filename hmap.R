@@ -18,9 +18,9 @@ head(hurr_tracks)
 head(rain, 15)
 
 #update the hurrincanexposuredata
-library(drat)
-addRepo("geanders")
-install.packages("hurricaneexposuredata")
+# library(drat)
+# addRepo("geanders")
+# install.packages("hurricaneexposuredata")
 
 #Extract the data of Katrina
 Katrina_track <- filter(hurr_tracks, storm_id =="Katrina-2005")
@@ -38,7 +38,10 @@ map_rain_exposure(storm ="Katrina-2005",
     ggtitle("Katrina-2005") +
     theme(plot.title = element_text(hjust = 0.5))
 
-
+#Function to map out the time-series rainfall map
+maprain <- function(x){map_counties(storm = "Katrina-2005", metric = "rainfall",days_included = c(x)) +
+        ggtitle("Katrina-2005") +
+        theme(plot.title = element_text(hjust = 0.5))}
 ###############################################
 
 
@@ -108,9 +111,9 @@ map_tracks(storms = storms_2018$storm_id)
 
 katrina_map <- map_event_exposure(storm = "Katrina-2005", event_type = "flood")
 
-map_tracks(storms = "Katrina-2005",
-    plot_object =floyd_map,
-    plot_points =TRUE,
-    color ="darkgray"
-)
+# map_tracks(storms = "Katrina-2005",
+#     plot_object =floyd_map,
+#     plot_points =TRUE,
+#     color ="darkgray"
+# )
 
