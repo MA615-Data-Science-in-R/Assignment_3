@@ -14,6 +14,8 @@ buoy_tags <- c("bygl1", "burl1", "42040", "dpia1", "gdil1", "taml1", "42007", "w
 url1 <- "http://www.ndbc.noaa.gov/view_text_file.php?filename="
 url2 <- ".txt.gz&dir=data/historical/stdmet/"
 
+Latitude <- c(25.9, 25.9, 30.1, 25.3, 29.2, 28.5, 27.4, 28.7, 29.2, 27.9, 27.9, 28.9, 29.8, 29.8, 30.3, 28.1, 29.3, 30.1, 30.3, 25.0, 30.2, 30.4, 29.7, 30.1, 29.7, 29.2, 30.3)
+Longitude <- c(-89.7, -85.6, -88.8, -82.2, -94.4, -84.5, -92.5, -86.0, -88.2, -94.0, -93.6, -89.4, -90.4, -93.3, -88.1, -93.7,-90.0, -90.4, -90.3, -80.4, -85.9, -87.2, -93.9, -84.3, -94.0, -90.7, -89.4)
 
 years <- c(2005)
 
@@ -29,32 +31,34 @@ N <- length(urls)
 for (i in 1:N){
   suppressMessages(  ###  This stops the annoying messages on your screen.
     file <- read_table(urls[i], col_names = TRUE)
-    )
+  )
   
   
-   if(colnames(file)=="YY"){
-     yr = file[1,1]
-     yr = paste0("19", yr)
-     file %<>% rename(YYYY=YY)
-     file$YYYY <- rep(yr, nrow(file))
-   }
-   file$station <- rep(filenames[i],nrow(file))
-   
-   assign(filenames[i], file)
-    
- # file <- get(filenames[i]) ## get() returns the value of an object
-                             ## when the arguement is the name of the 
-                             ## object -- as a string.
+  if(colnames(file)=="YY"){
+    yr = file[1,1]
+    yr = paste0("19", yr)
+    file %<>% rename(YYYY=YY)
+    file$YYYY <- rep(yr, nrow(file))
+  }
+  file$station <- rep(filenames[i],nrow(file))
+  file$Latitude <- rep(Latitude[i],nrow(file))
+  file$Longitude <- rep(Longitude[i],nrow(file))
   
-                             ## example:
-                             ## a <- c(1,3)
-                             ## b <- get(a)  throws and error
-                             ##
-                             ## b <- get('a')
-                             ## b
-                             ## [1] 1 3
+  assign(filenames[i], file)
   
- 
+  # file <- get(filenames[i]) ## get() returns the value of an object
+  ## when the arguement is the name of the 
+  ## object -- as a string.
+  
+  ## example:
+  ## a <- c(1,3)
+  ## b <- get(a)  throws and error
+  ##
+  ## b <- get('a')
+  ## b
+  ## [1] 1 3
+  
+  
   
   
   # put '19' in front of 2 digit years
@@ -101,16 +105,4 @@ fix_nums <- function(df){
 }
 result2 <- lapply(result, fix_nums)
 
-fulldf <- bind_rows(result2)
-
-# Add geometry to the dataframe
-
-Latitude <- c(25.9, 25.9, 30.1, 25.3, 29.2, 28.5, 27.4, 28.7, 29.2, 27.9, 27.9, 28.9, 29.8, 29.8, 30.3, 28.1, 29.3, 30.1, 30.3, 25.0, 30.2, 30.4, 29.7, 30.1, 29.7, 29.2, 30.3)
-Longitude <- c(-89.7, -85.6, -88.8, -82.2, -94.4, -84.5, -92.5, -86.0, -88.2, -94.0, -93.6, -89.4, -90.4, -93.3, -88.1, -93.7,-90.0, -90.4, -90.3, -80.4, -85.9, -87.2, -93.9, -84.3, -94.0, -90.7, -89.4)
-  
-geometry <- data.frame(Latitude, Longitude)
-
-buoy_data <- full_join(fulldf, geometry)
-
-
-
+buoy_data <- bind_rows(result2)
