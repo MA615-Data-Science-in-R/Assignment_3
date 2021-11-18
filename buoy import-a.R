@@ -93,7 +93,7 @@ tighten <- function(df){
   df %<>% filter(MM == "08", DD %in% c("26","27","28","29","30","31"))
 }
 
-result <- list(`42001_2005`, `42003_2005`, `42007_2005`, `42014_2005`, `42035_2005`, `42036_2005`, `42038_2005`, `42039_2005`, `42040_2005`, `42046_2005`, `42047_2005`, burl1_2005, bygl1_2005, capl1_2005, dpia1_2005, fgbl1_2005, gdil1_2005, labl1_2005, lkpl1_2005, mlrf1_2005, pcbf1_2005, pclf1_2005, sbpt2_2005,shpf1_2005, srst2_2005, taml1_2005, wavm6_2005) %>%
+result <- list(`42001`, `42003`, `42007`, `42014`, `42035`, `42036`, `42038`, `42039`, `42040`, `42046`, `42047`, burl1, bygl1, capl1, dpia1, fgbl1, gdil1, labl1, lkpl1, mlrf1, pcbf1, pclf1, sbpt2,shpf1, srst2, taml1, wavm6) %>%
   lapply(tighten)
 
 fix_nums <- function(df){
