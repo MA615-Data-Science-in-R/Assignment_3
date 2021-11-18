@@ -102,3 +102,15 @@ fix_nums <- function(df){
 result2 <- lapply(result, fix_nums)
 
 fulldf <- bind_rows(result2)
+
+# Add geometry to the dataframe
+
+Latitude <- c(25.9, 25.9, 30.1, 25.3, 29.2, 28.5, 27.4, 28.7, 29.2, 27.9, 27.9, 28.9, 29.8, 29.8, 30.3, 28.1, 29.3, 30.1, 30.3, 25.0, 30.2, 30.4, 29.7, 30.1, 29.7, 29.2, 30.3)
+Longitude <- c(-89.7, -85.6, -88.8, -82.2, -94.4, -84.5, -92.5, -86.0, -88.2, -94.0, -93.6, -89.4, -90.4, -93.3, -88.1, -93.7,-90.0, -90.4, -90.3, -80.4, -85.9, -87.2, -93.9, -84.3, -94.0, -90.7, -89.4)
+  
+geometry <- data.frame(Latitude, Longitude)
+
+buoy_data <- full_join(fulldf, geometry)
+
+
+
