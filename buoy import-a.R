@@ -93,6 +93,13 @@ world %>%
   xlab("Longitude") + ylab("Latitude") +
   ggtitle("Peak Gust Speed on August 29, 2005, 9:00 am", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
 
+world %>% 
+  ggplot() + geom_sf()+
+  geom_sf(data = landing, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
+  scale_fill_distiller(palette="RdYlBu") +
+  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+  xlab("Longitude") + ylab("Latitude") +
+  ggtitle("Wind Speed on August 29, 2005, 9:00 am", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
 
 
 
