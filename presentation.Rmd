@@ -1,0 +1,55 @@
+---
+title: "Hurricane Exploration"
+
+author: Jack, Will, Kosuke, Zara
+
+date: November 19th, 2021
+output: revealjs::revealjs_presentation
+theme: white
+---
+
+
+# Research Question or smth:{data-background="backgroud.jpg"}
+<div style="font-size:30pt">
+
+<section>    
+
+- [insert questions?]
+
+  
+ <ul >
+   <img src="strawberry.png"  height="180" width="250" style="align: center">
+ </ul> 
+    
+</section>
+
+
+# History and details {data-background="background.jpeg"}
+
+- Hurricane Katrina was a tropical cyclone that struck the southeastern United States in late August 2005. 
+- The hurricane and its aftermath claimed more than 1,800 lives
+- Ranked as the costliest natural disaster in U.S. history
+- Originated as a tropical depression from the merger of a tropical wave and the remnants of Tropical Depression Ten.
+
+
+```{r, echo=FALSE, warning=FALSE}
+
+```
+
+# Conclusions {data-background="background.jpg"}
+
+
+<div style="font-size:30px">
+
+
+ 
+</span> 
+ 
+
+
+**Additional questions**
+
+
+<span>
+
+</span> 
