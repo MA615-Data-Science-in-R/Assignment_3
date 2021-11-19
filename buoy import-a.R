@@ -9,13 +9,14 @@ library(magrittr)
 # 42001, lkpl1, 42003, 42036, pcbf1, pclf1, 42039, shpf1, 42038, 42014, 42047, fgbl1, 42046, capl1, sbpt2, srst2, 42035
 #FL buoys: mlrf1
 
-buoy_tags <- c("bygl1", "burl1", "42040", "dpia1", "gdil1", "taml1", "42007", "wavm6", "labl1", "pcbf1", "pclf1", "42039", "shpf1", "42038", "42014", "42047", "fgbl1", "42046", "capl1", "sbpt2", "srst2", "42035", "42001", "lkpl1", "42003", "42036", "mlrf1")
+buoy_tags <- sort(c("bygl1", "burl1", "42040", "dpia1", "gdil1", "taml1", "42007", "wavm6", "labl1", "pcbf1", "pclf1", "42039", "shpf1", "42038", "42014", "42047", "fgbl1", "42046", "capl1", "sbpt2", "srst2", "42035", "42001", "lkpl1", "42003", "42036", "mlrf1"))
 
 url1 <- "http://www.ndbc.noaa.gov/view_text_file.php?filename="
 url2 <- ".txt.gz&dir=data/historical/stdmet/"
 
-Latitude <- c(25.9, 25.9, 30.1, 25.3, 29.2, 28.5, 27.4, 28.7, 29.2, 27.9, 27.9, 28.9, 29.8, 29.8, 30.3, 28.1, 29.3, 30.1, 30.3, 25.0, 30.2, 30.4, 29.7, 30.1, 29.7, 29.2, 30.3)
 Longitude <- c(-89.7, -85.6, -88.8, -82.2, -94.4, -84.5, -92.5, -86.0, -88.2, -94.0, -93.6, -89.4, -90.4, -93.3, -88.1, -93.7,-90.0, -90.4, -90.3, -80.4, -85.9, -87.2, -93.9, -84.3, -94.0, -90.7, -89.4)
+Latitude <- c(25.9, 25.9, 30.1, 25.3, 29.2, 28.5, 27.4, 28.7, 29.2, 27.9, 27.9, 28.9, 29.8, 29.8, 30.3, 28.1, 29.3, 30.1, 30.3, 25.0, 30.2, 30.4, 29.7, 30.1, 29.7, 29.2, 30.3)
+
 
 years <- c(2005)
 
@@ -41,50 +42,14 @@ for (i in 1:N){
     file$YYYY <- rep(yr, nrow(file))
   }
   file$station <- rep(filenames[i],nrow(file))
-  file$Latitude <- rep(Latitude[i],nrow(file))
   file$Longitude <- rep(Longitude[i],nrow(file))
+  file$Latitude <- rep(Latitude[i],nrow(file))
   
   assign(filenames[i], file)
-  
-  # file <- get(filenames[i]) ## get() returns the value of an object
-  ## when the arguement is the name of the 
-  ## object -- as a string.
-  
-  ## example:
-  ## a <- c(1,3)
-  ## b <- get(a)  throws and error
-  ##
-  ## b <- get('a')
-  ## b
-  ## [1] 1 3
-  
-  
-  
-  
-  # put '19' in front of 2 digit years
-  # check that all columns are included
-  # filter down to only the 1 daily observation that you want
-  # etc etc etc
-  
-  # if(i == 1){
-  #   MR <- file
-  # }
-  # 
-  # else{
-  #   MR <- rbind.data.frame(MR, file)
-  # }
-  
-  
-  
 }
 
-# test <- `42040_2005`[1,]
-# test <- mutate(test,x = 29.207, y = -88.237)
-# 
-# library(gstat)
-# library(sp)
-# library(tidyverse)
-# library(sf)
+
+
 # library("rnaturalearth")
 # library("rnaturalearthdata")
 # coordinates(test) <- ~ x + y
@@ -106,3 +71,80 @@ fix_nums <- function(df){
 result2 <- lapply(result, fix_nums)
 
 buoy_data <- bind_rows(result2)
+
+
+library(sf)
+
+spatial_buoy_data <- st_as_sf(x = buoy_data, coords = c("Longitude", "Latitude"),
+                               crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+
+
+landing <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 6 & mm == 0)
+
+library(tmap) # thematic map plotting
+tmap_mode("view")
+tm_basemap() +
+tm_shape(landing) +
+  tm_bubbles(col = "GST", palette = "-RdYlBu", size = 1)
+
+
+ggplot(landing) + geom_sf() + stat_sf_coordinates(mapping = aes(color = GST))
+
+
+
+
+
+
+
+####################################################################
+#
+# Variogram Attempt. No convergence likley due to small sample size + distance between buoys.
+library(gstat) # variogram estimation
+
+# Helper functions
+spherical_variogram <- function (n, ps, r) function (h) {
+  h <- h / r
+  n + ps * ifelse(h < 1, 1.5 * h - .5 * h ^ 3, 1)
+}
+
+gaussian_variogram <- function (n, ps, r)+
+  function (h) n + ps * (1 - exp(-(h / r) ^ 2))
+
+# solves `A * x = v` where `C = chol(A)` is the Cholesky factor:
+chol_solve <- function (C, v) backsolve(C, backsolve(C, v, transpose = TRUE))
+
+kriging_smooth_spherical <- function (formula, data, ...) {
+  v <- variogram(formula, data)
+  v_fit <- fit.variogram(v, vgm("Sph", ...))
+  v_f <- spherical_variogram(v_fit$psill[1], v_fit$psill[2], v_fit$range[2])
+  
+  Sigma <- v_f(as.matrix(dist(coordinates(data)))) # semivariogram
+  Sigma <- sum(v_fit$psill) - Sigma # prior variance
+  tau2 <- v_fit$psill[1] # residual variance
+  C <- chol(tau2 * diag(nrow(data)) + Sigma)
+  y <- model.frame(formula, data)[, 1] # response
+  x <- model.matrix(formula, data)
+  # generalized least squares:
+  beta <- coef(lm.fit(backsolve(C, x, transpose = TRUE),
+                      backsolve(C, y, transpose = TRUE))) # prior mean
+  
+  Sigma_inv <- chol2inv(chol(Sigma))
+  C <- chol(Sigma_inv + diag(nrow(data)) / tau2)
+  # posterior mean (smoother):
+  mu <- drop(chol_solve(C, y / tau2 + Sigma_inv %*% x %*% beta))
+  list(smooth = mu, prior_mean = beta)
+}
+
+
+v <- variogram(WSPD ~ 1, landing)
+v_fit <- fit.variogram(v, vgm("Sph"))
+v_f <- spherical_variogram(v_fit$psill[1], v_fit$psill[2], v_fit$range[2])
+
+# check variogram and covariance
+op <- par(mfrow = c(1, 2))
+h <- seq(0, 1600, length = 1000)
+plot(v$dist, v$gamma,  pch = 19, col = "gray",
+     xlab = "distance", ylab = "semivariogram")
+lines(h, v_f(h))
+abline(v = v_fit$range[2], col = "gray")
+
