@@ -1,9 +1,6 @@
 library(tidyverse)
 library(magrittr)
 
-### reading data from buoy 44013  --  outside Boston harbor
-### make URLs by splitting the URL into two pieces --
-### "before the year" and "after the year"
 
 #LA buoys: bygl1, burl1, 42040, DPIA1, gdil1, taml1, 42007, wavm6, labl1
 # 42001, lkpl1, 42003, 42036, pcbf1, pclf1, 42039, shpf1, 42038, 42014, 42047, fgbl1, 42046, capl1, sbpt2, srst2, 42035
@@ -50,13 +47,6 @@ for (i in 1:N){
 
 
 
-# library("rnaturalearth")
-# library("rnaturalearthdata")
-# coordinates(test) <- ~ x + y
-# #proj4string(test) <- CRS("+init=epsg:28992")
-# world <- ne_countries(scale = "medium", returnclass = "sf")
-# ret <- class(world)
-# world %>% ggplot() + geom_sf() + stat_sf_coordinates()
 
 tighten <- function(df){
   df %<>% filter(MM == "08", DD %in% c("26","27","28","29","30","31"))
@@ -79,16 +69,27 @@ spatial_buoy_data <- st_as_sf(x = buoy_data, coords = c("Longitude", "Latitude")
                                crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
 
 
-landing <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 6 & mm == 0)
+landing <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 9 & mm == 0)
 
 library(tmap) # thematic map plotting
 tmap_mode("view")
 tm_basemap() +
 tm_shape(landing) +
-  tm_bubbles(col = "GST", palette = "-RdYlBu", size = 1)
+  tm_bubbles(col = "WVHT", palette = "-RdYlBu", size = 1)
 
 
-ggplot(landing) + geom_sf() + stat_sf_coordinates(mapping = aes(color = GST))
+
+library("rnaturalearth")
+library("rnaturalearthdata")
+world <- ne_countries(scale = "medium", returnclass = "sf")
+ret <- class(world)
+
+
+world %>% 
+  ggplot() + geom_sf()+
+  geom_sf(data = landing, size = 3, mapping = aes(fill = GST), color = "black", pch = 21) +
+  scale_fill_distiller(palette="RdYlBu") +
+  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)
 
 
 
@@ -136,13 +137,13 @@ kriging_smooth_spherical <- function (formula, data, ...) {
 }
 
 
-v <- variogram(WSPD ~ 1, landing)
+v <- variogram(GST ~ 1, landing)
 v_fit <- fit.variogram(v, vgm("Sph"))
 v_f <- spherical_variogram(v_fit$psill[1], v_fit$psill[2], v_fit$range[2])
 
 # check variogram and covariance
 op <- par(mfrow = c(1, 2))
-h <- seq(0, 1600, length = 1000)
+h <- seq(0, 1600, length = 10000)
 plot(v$dist, v$gamma,  pch = 19, col = "gray",
      xlab = "distance", ylab = "semivariogram")
 lines(h, v_f(h))
