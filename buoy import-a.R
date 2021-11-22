@@ -75,20 +75,46 @@ spatial_buoy_data <- st_as_sf(x = buoy_data, coords = c("Longitude", "Latitude")
                                crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
 
 
-#Subset buoy data on August 29, 2005, at 9:00 am, the time of the hurricane landfall
-landing <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 9 & mm == 0)
+#Subset buoy data on August 29, 2005, at 6:00 am (1100 UTC), the time of the hurricane landfall
+landing <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 11 & mm == 0)
+
+#Subset buoy data on August 29, 2005, at 4:00 am (900 UTC), two hours before the hurricane landfall
+#At landfall, many of the nearby buoys went out. More data can be seen two hours beforehand
+landing_2hb <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 9 & mm == 0)
+
+#Subset buoy data on August 29, 2005, at 1:00 am (600 UTC), the time of the hurricane landfall
+landing_5hb <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 6 & mm == 0)
+
 
 
 #tmap to help view data
 tmap_mode("view")
 tm_basemap() +
 tm_shape(landing) +
-  tm_bubbles(col = "WVHT", palette = "-RdYlBu", size = 1)
+  tm_bubbles(col = "GST", palette = "-RdYlBu", size = 1)
 
 
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 ret <- class(world)
+
+#Peak Gust Map 5 hours before landfall
+world %>% 
+  ggplot() + geom_sf()+
+  geom_sf(data = landing_5hb, size = 5, mapping = aes(fill = GST), color = "black", pch = 21) +
+  scale_fill_distiller(palette="RdYlBu") +
+  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+  xlab("Longitude") + ylab("Latitude") +
+  ggtitle("Peak Gust Speed on August 29, 2005, 1:00 am CDT (5 hours before landfall)", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
+
+#Peak Gust Map 2 hours before landfall
+world %>% 
+  ggplot() + geom_sf()+
+  geom_sf(data = landing_2hb, size = 5, mapping = aes(fill = GST), color = "black", pch = 21) +
+  scale_fill_distiller(palette="RdYlBu") +
+  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+  xlab("Longitude") + ylab("Latitude") +
+  ggtitle("Peak Gust Speed on August 29, 2005, 4:00 am CDT (2 hours before landfall)", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
 
 #Peak Gust Map at time of landfall
 world %>% 
@@ -97,7 +123,29 @@ world %>%
   scale_fill_distiller(palette="RdYlBu") +
   coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
   xlab("Longitude") + ylab("Latitude") +
-  ggtitle("Peak Gust Speed on August 29, 2005, 9:00 am", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
+  ggtitle("Peak Gust Speed on August 29, 2005, 6:00 am CDT (landfall)", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
+
+
+
+
+#Wind Speed map at time of landfall
+world %>% 
+  ggplot() + geom_sf()+
+  geom_sf(data = landing_5hb, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
+  scale_fill_distiller(palette="RdYlBu") +
+  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+  xlab("Longitude") + ylab("Latitude") +
+  ggtitle("Wind Speed on August 29, 2005, 1:00 am CDT (5 hours before landfall)", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
+
+#Wind Speed map at time of landfall
+world %>% 
+  ggplot() + geom_sf()+
+  geom_sf(data = landing_2hb, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
+  scale_fill_distiller(palette="RdYlBu") +
+  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+  xlab("Longitude") + ylab("Latitude") +
+  ggtitle("Wind Speed on August 29, 2005, 4:00 am CDT (2 hours before landfall)", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
+
 
 #Wind Speed map at time of landfall
 world %>% 
@@ -106,7 +154,7 @@ world %>%
   scale_fill_distiller(palette="RdYlBu") +
   coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
   xlab("Longitude") + ylab("Latitude") +
-  ggtitle("Wind Speed on August 29, 2005, 9:00 am", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
+  ggtitle("Wind Speed on August 29, 2005, 6:00 am CDT (landfall)", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
 
 
 
