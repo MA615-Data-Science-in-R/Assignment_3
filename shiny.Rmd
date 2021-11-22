@@ -23,12 +23,22 @@ library(ggplot2)
 
 ```{r, include = FALSE}
 source("hmap.R")
+source("buoy import-a.R")
 ```
 
+# History and details
+
+- Hurricane Katrina was a tropical cyclone that struck the southeastern United States in late August 2005. 
+- The hurricane and its aftermath claimed more than 1,800 lives
+- Ranked as the costliest natural disaster in U.S. history
+- Originated as a tropical depression from the merger of a tropical wave and the remnants of Tropical Depression Ten.
+
+# Rainfall from hurricane data
+The graphs below in shiny shows the changes of rainfall as Katrina approached. As you can see with selecting the rainfall day, there was not any rainfall 2 days before the landfall, and the rain began to fall gradually along the Katrina's track 1 day before the landfall, and reached its maximum on the day. The next day, however, the rain disappeared again.
 ```{r, echo=FALSE}
 # rainfall
 ui_1 <- fluidPage(
-  selectInput("days", "select the rainfall day", c(-5:5)),
+  selectInput("days", "select the rainfall day (landfall is day 0)", c(-5:5)),
   plotOutput("plot"),
 )
 server_1 <- function(input, output, session) {
