@@ -159,6 +159,39 @@ world %>%
 
 
 
+#Functions for mapping Gusts and WindSpeeds (must add ggtitle to plot after using function)
+map_buoy_gust <- function(data, day, hour){
+  sub_data <- subset(data, MM==8 & DD == day & hh == hour & mm == 0)
+  
+  world <- ne_countries(scale = "medium", returnclass = "sf")
+  ret <- class(world)
+  
+  p <- world %>% 
+    ggplot() + geom_sf()+
+    geom_sf(data = sub_data, size = 5, mapping = aes(fill = GST), color = "black", pch = 21) +
+    scale_fill_distiller(palette="RdYlBu") +
+    coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+    xlab("Longitude") + ylab("Latitude")
+  
+  return(p)
+}
+
+map_buoy_windspeed <- function(data, day, hour){
+  sub_data <- subset(data, MM==8 & DD == day & hh == hour & mm == 0)
+  
+  world <- ne_countries(scale = "medium", returnclass = "sf")
+  ret <- class(world)
+  
+  p <- world %>% 
+    ggplot() + geom_sf()+
+    geom_sf(data = sub_data, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
+    scale_fill_distiller(palette="RdYlBu") +
+    coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+    xlab("Longitude") + ylab("Latitude")
+  
+  return(p)
+}
+
 
 
 ####################################################################
