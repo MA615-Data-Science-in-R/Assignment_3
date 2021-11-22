@@ -1,7 +1,6 @@
 library(tidyverse)
 library(magrittr)
 library(sf)
-library(tmap)
 library("rnaturalearth")
 library("rnaturalearthdata")
 
@@ -87,13 +86,6 @@ landing_5hb <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 6 & mm == 0)
 
 
 
-#tmap to help view data
-tmap_mode("view")
-tm_basemap() +
-tm_shape(landing) +
-  tm_bubbles(col = "GST", palette = "-RdYlBu", size = 1)
-
-
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 ret <- class(world)
@@ -128,7 +120,7 @@ world %>%
 
 
 
-#Wind Speed map at time of landfall
+#Wind Speed map 5 hours before landfall
 world %>% 
   ggplot() + geom_sf()+
   geom_sf(data = landing_5hb, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
@@ -137,7 +129,7 @@ world %>%
   xlab("Longitude") + ylab("Latitude") +
   ggtitle("Wind Speed on August 29, 2005, 1:00 am CDT (5 hours before landfall)", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
 
-#Wind Speed map at time of landfall
+#Wind Speed map 2 hours before landfall
 world %>% 
   ggplot() + geom_sf()+
   geom_sf(data = landing_2hb, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
@@ -240,10 +232,21 @@ v_fit <- fit.variogram(v, vgm("Sph"))
 v_f <- spherical_variogram(v_fit$psill[1], v_fit$psill[2], v_fit$range[2])
 
 # check variogram and covariance
-op <- par(mfrow = c(1, 2))
 h <- seq(0, 1600, length = 10000)
 plot(v$dist, v$gamma,  pch = 19, col = "gray",
-     xlab = "distance", ylab = "semivariogram")
+     xlab = "distance", ylab = "semivariogram", main="Gust Speed Variogram")
 lines(h, v_f(h))
 abline(v = v_fit$range[2], col = "gray")
 
+
+#Fit Wind speed to variogram
+v <- variogram(WSPD ~ 1, landing)
+v_fit <- fit.variogram(v, vgm("Sph"))
+v_f <- spherical_variogram(v_fit$psill[1], v_fit$psill[2], v_fit$range[2])
+
+# check variogram and covariance
+h <- seq(0, 1600, length = 10000)
+plot(v$dist, v$gamma,  pch = 19, col = "gray",
+     xlab = "distance", ylab = "semivariogram", main = "Wind Speed Variogram")
+lines(h, v_f(h))
+abline(v = v_fit$range[2], col = "gray")
