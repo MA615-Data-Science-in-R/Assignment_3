@@ -12,11 +12,11 @@ data("hurr_tracks")
 
 data("rain")
 
-head(hurr_tracks)
-
-head(rain, 15)
-
-unique(rain$storm_id)
+# head(hurr_tracks)
+# 
+# head(rain, 15)
+# 
+# unique(rain$storm_id)
 
 # Define function to look at rainfall, wind 
 
@@ -58,21 +58,21 @@ hmapper <- function(hurr){
 
 hmap <- hmapper("Katrina-2005") 
 
-hmap$rmap
-hmap$expos
+# hmap$rmap
+# hmap$expos
 hmap$wmap1
 hmap$wmap2
 hmap$wmap3
 hmap$wmap4
-
-# Extract time from the data
-hurr_tracks$year <- substr(hurr_tracks$date, 1, 4) 
-hurr_tracks$month <- substr(hurr_tracks$date, 5, 6) 
-hurr_tracks$day <- substr(hurr_tracks$date, 7, 8)
-hurr_tracks$time <- substr(hurr_tracks$date, 9, 12)
-
-# Filter the data
-
-Katrina <- hurr_tracks %>% filter(storm_id == "Katrina-2005", day == "25")
+# 
+# # Extract time from the data
+# hurr_tracks$year <- substr(hurr_tracks$date, 1, 4) 
+# hurr_tracks$month <- substr(hurr_tracks$date, 5, 6) 
+# hurr_tracks$day <- substr(hurr_tracks$date, 7, 8)
+# hurr_tracks$time <- substr(hurr_tracks$date, 9, 12)
+# 
+# # Filter the data
+# 
+# Katrina <- hurr_tracks %>% filter(storm_id == "Katrina-2005", day == "25")
 
 
