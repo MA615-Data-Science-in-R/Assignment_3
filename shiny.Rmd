@@ -42,7 +42,7 @@ The application below can help you navigate between different days before and af
 ```{r, echo=FALSE}
 # rainfall
 ui_1 <- fluidPage(
-  selectInput("days", "select the rainfall day (landfall is day 0)", c(-5:5)),
+  selectInput("days", "Select the rainfall day (landfall is day 0)", c(-5:5)),
   plotOutput("plot"),
 )
 server_1 <- function(input, output, session) {
@@ -52,21 +52,3 @@ server_1 <- function(input, output, session) {
 shinyApp(ui_1, server_1)
 
 ```
-
-# Variogram results
-
-We displayed the variance between the gust speeds from different buoys at the time of landing in a variogram. 
-
-```{r, echo=FALSE, warning=FALSE}
-plot(v$dist, v$gamma,  pch = 19, col = "gray",
-     xlab = "distance", ylab = "semivariogram", main="Gust Speed Variogram")
-lines(h, v_f(h))
-abline(v = v_fit$range[2], col = "gray")
-```
-
-
-However, the variogram did not converge and the results were not very meaningful. Some reasons for this could be:
-
-- We used too small a number of buoys to get the sense of a significant relationship between them.
-- The buoy data is measured inconsistently
-- Missing data values are shown as extremely high values instead of no data values.
