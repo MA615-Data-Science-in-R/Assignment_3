@@ -64,6 +64,7 @@ server_2 <- function(input, output, session) {
 
 shinyApp(ui_2, server_2)
 ```
+<<<<<<< HEAD
 
 # Wind Speed map
 
@@ -100,3 +101,5 @@ However, the variogram did not converge and the results were not very meaningful
 - The buoy data is measured inconsistently
 - Missing data values are shown as extremely high values instead of no data values.
 
+=======
+>>>>>>> 0369f9df7b481a88fd5bedce14b89013328807ee
