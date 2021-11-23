@@ -38,7 +38,7 @@ The graphs below in shiny shows the changes of rainfall as Katrina approached. A
 ```{r, echo=FALSE}
 # rainfall
 ui_1 <- fluidPage(
-  selectInput("days", "select the rainfall day (landfall is day 0)", c(-5:5)),
+  selectInput("days", "Select the rainfall day (landfall is day 0)", c(-5:5)),
   plotOutput("plot"),
 )
 server_1 <- function(input, output, session) {
@@ -47,4 +47,32 @@ server_1 <- function(input, output, session) {
 
 shinyApp(ui_1, server_1)
 
+```
+
+# Peak Gust Map
+```{r, echo=FALSE}
+# Peak Gust Map
+ui_2 <- fluidPage(
+  selectInput("hours", "Select the time before tha landfall (hour)", c(0, -2, -5)),
+  plotOutput("plot"),
+)
+server_2 <- function(input, output, session) {
+  output$plot <- renderPlot({worldmap(input$hours)}, res = 96)
+  }
+
+shinyApp(ui_2, server_2)
+```
+
+#Wind Speed map
+```{r, echo=FALSE}
+# Wind Speed map
+ui_3 <- fluidPage(
+  selectInput("hours", "Select the time before tha landfall (hour)", c(0, -2, -5)),
+  plotOutput("plot"),
+)
+server_3 <- function(input, output, session) {
+  output$plot <- renderPlot({worldmap2(input$hours)}, res = 96)
+  }
+
+shinyApp(ui_3, server_3)
 ```
