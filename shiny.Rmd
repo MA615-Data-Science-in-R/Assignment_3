@@ -58,7 +58,7 @@ hmap$wmap1
 ```
 
 
-# Peak Gust Map
+# Peak Gust Map (Ocean)
 Using data from NOAA's National Data Buoy Center, we were able to find 27 buoys with historical data around the landfall of Hurricane Katrina in Louisiana. We decided to focus on Peak Gust Speed and Wind Speed, as these had a direct connection to variables within the Hurricane Exposure package (as seen in our maps above), and are used as a measurement for the strength of a hurricane. For these maps, we choose time periods at the hurricane landfall, 2 hours before the landfall, and 5 hours before the landfall. This way, we can see the progression of the hurricane as it approaches the coast. We also did this as many of the buoys lost data during the landfall, likely due to the severity of the storm. 
 
 Looking at the Peak Gust Map, we see that the strongest winds are near the South of Louisiana. This matches up with the Hurricane Exposure map, as the Peak Gusts were also the strongest throughout this area. Both maps also show some strong gusts in the areas next to Louisiana, and much weaker to nonexistant gusts in the surrounding areas.
@@ -74,7 +74,15 @@ server_2 <- function(input, output, session) {
 shinyApp(ui_2, server_2)
 ```
 
-# Wind Speed map
+# Peak Gust Map (Land)
+This map is comparable to the ocean map at the time of landfall. The maps are similar in Louisiana and Mississippi but not in Florida.
+```{r}
+map_counties("Katrina-2005", metric = "wind", wind_var = "vmax_gust") +
+  ggtitle("Max Gust Winds") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+# Wind Speed map (Ocean)
 
 The Observations for the Peak Gust Map apply to the Wind Speed Map as well. The highgest winds from the buoy data appear along the Louisiana coast, matching up with what we see in the Hurricane Exposure map. The surrounding areas don't show much higher winds than noraml, aligning with the Hurricane Exposure data.
 ```{r, echo=FALSE}
@@ -87,6 +95,14 @@ server_3 <- function(input, output, session) {
   output$plot <- renderPlot({worldmap2(input$hours)}, res = 96)
   }
 shinyApp(ui_3, server_3)
+```
+
+# Wind Speed map (Land)
+The wind land map shows maximum sustained winds instead of average winds. But the maps are still very similar.
+```{r}
+map_counties("Katrina-2005", metric = "wind") +
+  ggtitle("Max Sustained Winds") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
