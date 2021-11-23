@@ -71,82 +71,98 @@ buoy_data <- bind_rows(result2)
 
 #Transform dataframe into spatial dataframe
 spatial_buoy_data <- st_as_sf(x = buoy_data, coords = c("Longitude", "Latitude"),
-                               crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+                              crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+#Subset buoy data on August 29, 2005, at 1:00, 4:00, and 6:00 am(5hr, 2hr before the landfall and the time of the landfall)
+landing <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh %in% c(6, 9, 11) & mm == 0)
+landing <- landing %>% mutate(hit = ifelse(hh == 11, 0, ifelse(hh == 9, -2, -5)))
 
-
-#Subset buoy data on August 29, 2005, at 6:00 am (1100 UTC), the time of the hurricane landfall
-landing <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 11 & mm == 0)
-
-#Subset buoy data on August 29, 2005, at 4:00 am (900 UTC), two hours before the hurricane landfall
-#At landfall, many of the nearby buoys went out. More data can be seen two hours beforehand
-landing_2hb <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 9 & mm == 0)
-
-#Subset buoy data on August 29, 2005, at 1:00 am (600 UTC), the time of the hurricane landfall
-landing_5hb <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 6 & mm == 0)
-
+# #Subset buoy data on August 29, 2005, at 6:00 am (1100 UTC), the time of the hurricane landfall
+# landing <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 11 & mm == 0)
+# 
+# #Subset buoy data on August 29, 2005, at 4:00 am (900 UTC), two hours before the hurricane landfall
+# #At landfall, many of the nearby buoys went out. More data can be seen two hours beforehand
+# landing_2hb <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 9 & mm == 0)
+# 
+# #Subset buoy data on August 29, 2005, at 1:00 am (600 UTC), the time of the hurricane landfall
+# landing_5hb <- subset(spatial_buoy_data, MM==8 & DD == 29 & hh == 6 & mm == 0)
 
 
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 ret <- class(world)
 
-#Peak Gust Map 5 hours before landfall
-world %>% 
-  ggplot() + geom_sf()+
-  geom_sf(data = landing_5hb, size = 5, mapping = aes(fill = GST), color = "black", pch = 21) +
-  scale_fill_distiller(palette="RdYlBu") +
-  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
-  xlab("Longitude") + ylab("Latitude") +
-  ggtitle("Peak Gust Speed on August 29, 2005, 1:00 am CDT (5 hours before landfall)", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
+#Create titles used for Gust map
+title <- data.frame(content = c(
+  "Peak Gust Speed on August 29, 2005, 1:00 am CDT (5 hours before landfall)",
+  "Peak Gust Speed on August 29, 2005, 4:00 am CDT (2 hours before landfall)",
+  "Peak Gust Speed on August 29, 2005, 6:00 am CDT (landfall)"
+), id = c(-5,-2,0))
 
-#Peak Gust Map 2 hours before landfall
-world %>% 
-  ggplot() + geom_sf()+
-  geom_sf(data = landing_2hb, size = 5, mapping = aes(fill = GST), color = "black", pch = 21) +
-  scale_fill_distiller(palette="RdYlBu") +
-  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
-  xlab("Longitude") + ylab("Latitude") +
-  ggtitle("Peak Gust Speed on August 29, 2005, 4:00 am CDT (2 hours before landfall)", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
+#Peak Gust Map function at 2,5 hours before landfall and at the time of landfall
+worldmap <- function(x){world %>% 
+    ggplot() + geom_sf()+
+    geom_sf(data = subset(landing,hit == x), size = 5, mapping = aes(fill = GST), color = "black", pch = 21) +
+    scale_fill_distiller(palette="RdYlBu") +
+    coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+    xlab("Longitude") + ylab("Latitude") +
+    ggtitle(with(subset(title,id==x),content), subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
+  
+}
 
-#Peak Gust Map at time of landfall
-world %>% 
-  ggplot() + geom_sf()+
-  geom_sf(data = landing, size = 5, mapping = aes(fill = GST), color = "black", pch = 21) +
-  scale_fill_distiller(palette="RdYlBu") +
-  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
-  xlab("Longitude") + ylab("Latitude") +
-  ggtitle("Peak Gust Speed on August 29, 2005, 6:00 am CDT (landfall)", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
-
-
-
-
-#Wind Speed map 5 hours before landfall
-world %>% 
-  ggplot() + geom_sf()+
-  geom_sf(data = landing_5hb, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
-  scale_fill_distiller(palette="RdYlBu") +
-  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
-  xlab("Longitude") + ylab("Latitude") +
-  ggtitle("Wind Speed on August 29, 2005, 1:00 am CDT (5 hours before landfall)", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
-
-#Wind Speed map 2 hours before landfall
-world %>% 
-  ggplot() + geom_sf()+
-  geom_sf(data = landing_2hb, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
-  scale_fill_distiller(palette="RdYlBu") +
-  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
-  xlab("Longitude") + ylab("Latitude") +
-  ggtitle("Wind Speed on August 29, 2005, 4:00 am CDT (2 hours before landfall)", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
+# #Peak Gust Map 2 hours before landfall
+# world %>% 
+#   ggplot() + geom_sf()+
+#   geom_sf(data = landing_2hb, size = 5, mapping = aes(fill = GST), color = "black", pch = 21) +
+#   scale_fill_distiller(palette="RdYlBu") +
+#   coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+#   xlab("Longitude") + ylab("Latitude") +
+#   ggtitle("Peak Gust Speed on August 29, 2005, 4:00 am CDT (2 hours before landfall)", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
+# 
+# #Peak Gust Map at time of landfall
+# world %>% 
+#   ggplot() + geom_sf()+
+#   geom_sf(data = landing, size = 5, mapping = aes(fill = GST), color = "black", pch = 21) +
+#   scale_fill_distiller(palette="RdYlBu") +
+#   coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+#   xlab("Longitude") + ylab("Latitude") +
+#   ggtitle("Peak Gust Speed on August 29, 2005, 6:00 am CDT (landfall)", subtitle = "(Gust speed (m/s) measured as peak wind speed over 5 - 8 seconds during the eight-minute or two-minute period.)")
 
 
-#Wind Speed map at time of landfall
-world %>% 
-  ggplot() + geom_sf()+
-  geom_sf(data = landing, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
-  scale_fill_distiller(palette="RdYlBu") +
-  coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
-  xlab("Longitude") + ylab("Latitude") +
-  ggtitle("Wind Speed on August 29, 2005, 6:00 am CDT (landfall)", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
+#Create titles used for Wind map
+title2 <- data.frame(content = c(
+  "Wind Speed on August 29, 2005, 1:00 am CDT (5 hours before landfall)",
+  "Wind Speed on August 29, 2005, 4:00 am CDT (2 hours before landfall)",
+  "Wind Speed on August 29, 2005, 6:00 am CDT (landfall)"
+), id = c(-5,-2,0))
+
+#Wind Speed map 2,5 hours before landfall and at the time of landfall
+worldmap2 <- function(x){world %>% 
+    ggplot() + geom_sf()+
+    geom_sf(data = subset(landing,hit == x), size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
+    scale_fill_distiller(palette="RdYlBu") +
+    coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+    xlab("Longitude") + ylab("Latitude") +
+    ggtitle(with(subset(title2,id==x),content), subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
+}
+
+# #Wind Speed map 2 hours before landfall
+# world %>% 
+#   ggplot() + geom_sf()+
+#   geom_sf(data = landing_2hb, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
+#   scale_fill_distiller(palette="RdYlBu") +
+#   coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+#   xlab("Longitude") + ylab("Latitude") +
+#   ggtitle("Wind Speed on August 29, 2005, 4:00 am CDT (2 hours before landfall)", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
+# 
+# 
+# #Wind Speed map at time of landfall
+# world %>% 
+#   ggplot() + geom_sf()+
+#   geom_sf(data = landing, size = 5, mapping = aes(fill = WSPD), color = "black", pch = 21) +
+#   scale_fill_distiller(palette="RdYlBu") +
+#   coord_sf(xlim = c(-97, -79), ylim = c(24,32), expand = FALSE)+
+#   xlab("Longitude") + ylab("Latitude") +
+#   ggtitle("Wind Speed on August 29, 2005, 6:00 am CDT (landfall)", subtitle = "(Wind speed (m/s) averaged over an eight-minute period)")
 
 
 
@@ -183,7 +199,6 @@ map_buoy_windspeed <- function(data, day, hour){
   
   return(p)
 }
-
 
 
 ####################################################################
@@ -231,22 +246,22 @@ v <- variogram(GST ~ 1, landing)
 v_fit <- fit.variogram(v, vgm("Sph"))
 v_f <- spherical_variogram(v_fit$psill[1], v_fit$psill[2], v_fit$range[2])
 
-# check variogram and covariance
+# # check variogram and covariance
 h <- seq(0, 1600, length = 10000)
-plot(v$dist, v$gamma,  pch = 19, col = "gray",
-     xlab = "distance", ylab = "semivariogram", main="Gust Speed Variogram")
-lines(h, v_f(h))
-abline(v = v_fit$range[2], col = "gray")
+# plot(v$dist, v$gamma,  pch = 19, col = "gray",
+#      xlab = "distance", ylab = "semivariogram", main="Gust Speed Variogram")
+# lines(h, v_f(h))
+# abline(v = v_fit$range[2], col = "gray")
 
 
-#Fit Wind speed to variogram
-v <- variogram(WSPD ~ 1, landing)
-v_fit <- fit.variogram(v, vgm("Sph"))
-v_f <- spherical_variogram(v_fit$psill[1], v_fit$psill[2], v_fit$range[2])
-
-# check variogram and covariance
-h <- seq(0, 1600, length = 10000)
-plot(v$dist, v$gamma,  pch = 19, col = "gray",
-     xlab = "distance", ylab = "semivariogram", main = "Wind Speed Variogram")
-lines(h, v_f(h))
-abline(v = v_fit$range[2], col = "gray")
+# #Fit Wind speed to variogram
+# v <- variogram(WSPD ~ 1, landing)
+# v_fit <- fit.variogram(v, vgm("Sph"))
+# v_f <- spherical_variogram(v_fit$psill[1], v_fit$psill[2], v_fit$range[2])
+# 
+# # check variogram and covariance
+# h <- seq(0, 1600, length = 10000)
+# plot(v$dist, v$gamma,  pch = 19, col = "gray",
+#      xlab = "distance", ylab = "semivariogram", main = "Wind Speed Variogram")
+# lines(h, v_f(h))
+# abline(v = v_fit$range[2], col = "gray")
