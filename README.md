@@ -13,4 +13,4 @@ Professor: Haviland Wright, Boston University
 
 - Afterwards, we collected buoy data that was near the hurricane landing site in Louisiana. The buoy data was vast and messy, so it was filtered down into an easier and combined dataframe. Plots were then constructed to see if this information matched what we found the hurricaneexposure package. A variogram was attempted to explain wind speed and gust speed variance, but results were not very fruitful. This work can be found in the buoy import-a.R file
 
-- Our results and findings were written as a combined report with shiny embedded so that some of the maps could be better explored by the viewer. The report can be found by running shiny.Rmd
+- Our results and findings were written as a combined report with shiny embedded so that some of the maps could be better explored by the viewer. The report can be found by running shiny.Rmd, or be pasting the html link into the following website: https://htmlpreview.github.io/
