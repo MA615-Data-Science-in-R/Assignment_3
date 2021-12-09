@@ -25,7 +25,15 @@ head(rain, 15)
 #Extract the data of Katrina
 Katrina_track <- filter(hurr_tracks, storm_id =="Katrina-2005")
 
-map_counties(storm = "Katrina-2005", metric = "rainfall",days_included = c(0)) +
+rain1 <- map_counties(storm = "Katrina-2005", metric = "rainfall",days_included = c(-1)) +
+    ggtitle("Katrina-2005") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+rain2 <- map_counties(storm = "Katrina-2005", metric = "rainfall",days_included = c(0)) +
+    ggtitle("Katrina-2005") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+rain3 <- map_counties(storm = "Katrina-2005", metric = "rainfall",days_included = c(2)) +
     ggtitle("Katrina-2005") +
     theme(plot.title = element_text(hjust = 0.5))
 
@@ -34,7 +42,7 @@ map_counties(storm = "Katrina-2005", metric = "rainfall",days_included = c(0)) +
 map_rain_exposure(storm ="Katrina-2005", 
                   rain_limit = 175, 
                   dist_limit = 500, 
-                  days_included =-5:3) +
+                  days_included = 0) +
     ggtitle("Katrina-2005") +
     theme(plot.title = element_text(hjust = 0.5))
 

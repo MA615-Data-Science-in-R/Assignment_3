@@ -3,7 +3,6 @@ title: "MA615 Assignment3"
 author: "William Zen, Jack Carbaugh, Zara Waheed, Kosuke Sasaki"
 date: "11/17/2021"
 output: html_document
-runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -16,6 +15,7 @@ library(magrittr)
 library(shiny)
 library(maps)
 library(drat)
+addRepo("geanders")
 library(hurricaneexposuredata)
 library(hurricaneexposure)
 library(ggplot2)
@@ -35,18 +35,13 @@ source("visualising.R")
 - Originated as a tropical depression from the merger of a tropical wave and the remnants of Tropical Depression Ten.
 
 # Rainfall from hurricane data
-The graphs below in the shiny app show the changes in rainfall levels as Katrina approached. As you can see, when you switch through the days before and after the rainfall, there was not any rain 2 days before the landfall, and the rain began to fall gradually along the Katrina track 1 day before the landfall, and reached its maximum on that day. The next day, however, the rain disappeared again.
+The graph below shows the changes in rainfall levels as Katrina approached. As you can see, when you look at the days before and after the rainfall, there was only a bit of rainfall around Louisiana the day before the landfall, and the rain began to fall much more heavily along the Katrina track on the day of the landfall, and reached its maximum on that day. The next day, however, the rain disappeared again.
 
 ```{r, echo=FALSE}
 # rainfall
-ui_1 <- fluidPage(
-  selectInput("days", "Select the rainfall day (landfall is day 0)", c(-5:5)),
-  plotOutput("plot"),
-)
-server_1 <- function(input, output, session) {
-  output$plot <- renderPlot({maprain(input$days)}, res = 96)
-  }
-shinyApp(ui_1, server_1)
+rain1 + ggtitle(label="Rainfall One day Before Hurricane Landing")
+rain2 + ggtitle(label="Rainfall on Day of Hurricane Landing")
+rain3 + ggtitle(label="Rainfall One day After Hurricane Landing")
 ```
 
 # Wind Hurricane Exposure map
@@ -64,14 +59,9 @@ Using data from NOAA's National Data Buoy Center, we were able to find 27 buoys 
 Looking at the Peak Gust Map, we see that the strongest winds are near the South of Louisiana. This matches up with the Hurricane Exposure map, as the Peak Gusts were also the strongest throughout this area. Both maps also show some strong gusts in the areas next to Louisiana, and much weaker to nonexistant gusts in the surrounding areas.
 ```{r, echo=FALSE}
 # Peak Gust Map
-ui_2 <- fluidPage(
-  selectInput("hours", "Select the time before the landfall (hour)", c(0, -2, -5)),
-  plotOutput("plot"),
-)
-server_2 <- function(input, output, session) {
-  output$plot <- renderPlot({worldmap(input$hours)}, res = 96)
-  }
-shinyApp(ui_2, server_2)
+gust1
+gust2
+gust3
 ```
 
 # Peak Gust Map (Land)
@@ -87,14 +77,9 @@ map_counties("Katrina-2005", metric = "wind", wind_var = "vmax_gust") +
 The Observations for the Peak Gust Map apply to the Wind Speed Map as well. The highgest winds from the buoy data appear along the Louisiana coast, matching up with what we see in the Hurricane Exposure map. The surrounding areas don't show much higher winds than noraml, aligning with the Hurricane Exposure data.
 ```{r, echo=FALSE}
 # Wind Speed map
-ui_3 <- fluidPage(
-  selectInput("hours", "Select the time before the landfall (hour)", c(0, -2, -5)),
-  plotOutput("plot"),
-)
-server_3 <- function(input, output, session) {
-  output$plot <- renderPlot({worldmap2(input$hours)}, res = 96)
-  }
-shinyApp(ui_3, server_3)
+wind1
+wind2
+wind3
 ```
 
 # Wind Speed map (Land)
